@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cajita de Amor</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<div id="app">
+ 
+  <div id="chest-screen">
+    <div id="top-label">Para tí mi reina, con amor de tu novio ♥</div>
+ 
+    <svg id="chest-svg" width="180" height="160" viewBox="0 0 180 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Body -->
+      <rect x="10" y="72" width="160" height="80" rx="10" fill="#f9d0e0" stroke="#d08098" stroke-width="2"/>
+      <!-- Hinge strip -->
+      <rect x="10" y="72" width="160" height="12" rx="3" fill="#f0b0c8" stroke="#d08098" stroke-width="1"/>
+      <!-- Lock plate -->
+      <rect x="62" y="100" width="56" height="34" rx="6" fill="#f0a0bc" stroke="#c07090" stroke-width="1.5"/>
+      <!-- Lock circle -->
+      <circle cx="90" cy="117" r="8" fill="#d06888" stroke="#b04868" stroke-width="1.5"/>
+      <circle cx="90" cy="117" r="3" fill="#f0c0d0"/>
+      <!-- Lid -->
+      <path d="M10 72 Q10 20 90 18 Q170 20 170 72" fill="#fde8f0" stroke="#d08098" stroke-width="2"/>
+      <!-- Lid center line -->
+      <path d="M90 18 Q90 44 90 72" stroke="#d08098" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/>
+      <!-- Heart on lid -->
+      <path d="M80 54 Q82 46 90 49 Q98 46 100 54 Q98 62 90 68 Q82 62 80 54Z" fill="#e85080" opacity="0.9"/>
+      <!-- Decorative dots -->
+      <circle cx="38" cy="36" r="4" fill="#f4a0c0" opacity="0.7"/>
+      <circle cx="145" cy="30" r="3.5" fill="#f4a0c0" opacity="0.6"/>
+      <circle cx="62" cy="14" r="2.5" fill="#f8c0d4" opacity="0.8"/>
+      <circle cx="120" cy="10" r="2.5" fill="#f8c0d4" opacity="0.7"/>
+      <circle cx="28" cy="56" r="2" fill="#f8d0e0" opacity="0.6"/>
+      <circle cx="155" cy="52" r="2" fill="#f8d0e0" opacity="0.6"/>
+      <!-- Gold trim lines -->
+      <rect x="10" y="82" width="160" height="3" rx="1" fill="#e8c8a0" opacity="0.6"/>
+    </svg>
+ 
+    <div id="counter-text">0 mensajes descubiertos</div>
+    <div id="progress"></div>
+    <div class="hint">Toca la cajita para descubrir un mensaje ✨</div>
+  </div>
+ 
+  <div id="card-screen">
+    <div id="card-area"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="goBack()">← Volver</button>
+      <button class="btn btn-main" onclick="nextCard()">Otro mensaje ✦</button>
+    </div>
+    <div id="card-counter-display"></div>
+  </div>
+ 
+</div>
+ 
+<script>
+const messages = [
+  { type:"Mensaje", icon:"💌", text:"Cada día que pasa estoy más seguro de que eres lo mejor que me ha podido pasar. La distancia es solo un número.", sub:null },
+  { type:"Recuerdo", icon:"🌙", text:"¿Recuerdas la primera vez que nos quedamos hablando hasta el amanecer? Ese día supe que eras especial.", sub:"Un recuerdo que atesoro" },
+  { type:"Promesa", icon:"✈️", text:"Prometo que cada kilómetro que nos separa hoy, lo recorreremos juntos en muchas aventuras.", sub:null },
+  { type:"Razón", icon:"✨", text:"Me encantas porque incluso estando lejos, logras hacerme sentir muchas cosas.", sub:"Razón #1 por la que te quiero" },
+  { type:"Promesa", icon:"❤️‍🔥", text:"Prometo construir contigo un futuro donde la distancia sea solo un recuerdo.", sub:""},
+  { type:"Mensaje", icon:"👸", text:"Eres mi mundo, mi niña, mi reina, mi persona favorita, la razon de mis alegrias.", sub:null },
+  { type:"Promesa", icon:"🌹", text:"Prometo elegirte todos los días, incluso en los momentos difíciles, incluso cuando la distancia pese, porque sé que lo que tenemos vale más que cualquier kilómetro.", sub:"" },
+  { type:"Promesa", icon:"🏠", text:"Un día vamos a tener una dirección en común. Ese momento ya lo estoy imaginando.", sub:null },
+  { type:"Razón", icon:"💛", text:"Me gustas incluso cuando no tienes idea de lo increíble que eres. Sobre todo en esos momentos.", sub:"Razón #2 por la que te quiero" },
+  { type:"Promesa", icon:"🤞", text:"Prometo ser tu apoyo incluso cuando no pueda abrazarte.", sub:""},
+];
+ 
+let seen = [], currentIdx = null;
+ 
+function buildDots() {
+  const p = document.getElementById('progress');
+  p.innerHTML = '';
+  messages.forEach((_,i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (seen.includes(i) ? ' seen' : '');
+    p.appendChild(d);
+  });
+}
+ 
+function updateCounter() {
+  document.getElementById('counter-text').textContent =
+    seen.length + ' de ' + messages.length + ' mensajes descubiertos';
+}
+ 
+function pickNext(exclude) {
+  const unseen = messages.map((_,i)=>i).filter(i=>!seen.includes(i));
+  if (unseen.length > 0) return unseen[Math.floor(Math.random()*unseen.length)];
+  return messages.map((_,i)=>i).filter(i=>i!==exclude)[Math.floor(Math.random()*(messages.length-1))];
+}
+ 
+function spawnPetals() {
+  for (let i=0; i<5; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'petal';
+      p.textContent = ['🌸','✨','💕','🌺','💖'][Math.floor(Math.random()*5)];
+      p.style.left = Math.random()*100+'vw';
+      p.style.top = '-20px';
+      p.style.animationDuration = (1.5 + Math.random()*2)+'s';
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 3500);
+    }, i*120);
+  }
+}
+ 
+function showCard(idx) {
+  const m = messages[idx];
+  currentIdx = idx;
+  if (!seen.includes(idx)) seen.push(idx);
+  spawnPetals();
+  document.getElementById('card-area').innerHTML = `
+    <div class="card">
+      <div class="card-icon">${m.icon}</div>
+      <div class="card-type">${m.type}</div>
+      <div class="card-content">${m.text}</div>
+      ${m.sub ? `<div class="card-sub">${m.sub}</div>` : ''}
+    </div>`;
+  document.getElementById('card-counter-display').textContent =
+    seen.length + ' de ' + messages.length + ' mensajes descubiertos';
+  document.getElementById('chest-screen').style.display = 'none';
+  document.getElementById('card-screen').style.display = 'flex';
+  buildDots(); updateCounter();
+}
+ 
+function goBack() {
+  document.getElementById('chest-screen').style.display = 'flex';
+  document.getElementById('card-screen').style.display = 'none';
+}
+ 
+function nextCard() { showCard(pickNext(currentIdx)); }
+ 
+document.getElementById('chest-screen').addEventListener('click', () => showCard(pickNext(currentIdx)));
+buildDots(); updateCounter();
+</script>
+</body>
+</html>
+ 
